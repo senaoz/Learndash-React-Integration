@@ -3,8 +3,8 @@ import axios from "axios";
 import { Buffer } from "buffer";
 
 function App() {
-  var username = "sena";
-  var password = "senaoz2001";
+  var username = process.env.USER_PASS;
+  var password = process.env.USER_NAME;
   var baseURL = "https://egitim.yetkingencler.com/wp-json";
   const token = `${username}:${password}`;
   const encodedToken = Buffer.from(token).toString("base64");
