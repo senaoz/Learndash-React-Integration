@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Buffer } from "buffer";
 
 function App() {
-  var username = process.env.USER_PASS;
-  var password = process.env.USER_NAME;
+  var username = "sena";
+  var password = "senaoz2001";
   var baseURL = "https://egitim.yetkingencler.com/wp-json";
   const token = `${username}:${password}`;
   const encodedToken = Buffer.from(token).toString("base64");
@@ -19,7 +19,7 @@ function App() {
     );
   });
 
-  function userCourseProgress(id, course) {
+  function userCourseProgress(id) {
     const session_url = `${baseURL}/ldlms/v2/users/${id}/course-progress/`;
 
     var config = {
@@ -28,13 +28,19 @@ function App() {
       headers: { Authorization: "Basic " + encodedToken },
     };
 
-    axios(config)
-      .then(function (response) {
-        setProgress(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    useEffect(() => {
+      const fetchCourseProgress = async () => {
+        await axios(config)
+          .then(function (response) {
+            setProgress(response.data);
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+      fetchCourseProgress();
+    }, []);
   }
 
   function Courses() {
@@ -46,16 +52,31 @@ function App() {
       headers: { Authorization: "Basic " + encodedToken },
     };
 
-    axios(config)
-      .then(function (response) {
-        setCourses(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    useEffect(() => {
+      const fetchCourses = async () => {
+        await axios(config)
+          .then(function (response) {
+            setCourses(response.data);
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      };
+      fetchCourses();
+    }, []);
   }
+
   userCourseProgress(1);
   Courses();
+
+  function CourseName(courseID) {
+    for (let i = 0; i < courses.length; i++) {
+      if (courseID === courses[i].id) {
+        return courses[i].title.rendered;
+      }
+    }
+  }
 
   return (
     <div className="xl:w-1/2 xl:ml-9">
@@ -63,6 +84,7 @@ function App() {
       {userProgress.map((progress, index) => (
         <tr key={index + 1}>
           <th>{index + 1}</th>
+          <td>{CourseName(progress.course)}</td>
           <td>{progress.course}</td>
           <td>{progress.steps_completed}</td>
           <td>{progress.steps_total}</td>
@@ -72,7 +94,7 @@ function App() {
       ))}
 
       <h2>Aktif Kurslar</h2>
-      <p>{courses.length == 0 ? "Yükleniyor, lütfen bekleyiniz.." : null}</p>
+      <p>{courses.length === 0 ? "Yükleniyor, lütfen bekleyiniz.." : null}</p>
       <input
         type="text"
         value={filter}
