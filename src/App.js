@@ -3,9 +3,9 @@ import axios from "axios";
 import { Buffer } from "buffer";
 
 function App() {
-  var username = "sena";
-  var password = "senaoz2001";
-  var baseURL = "https://egitim.yetkingencler.com/wp-json";
+  var username = process.env.REACT_APP_USERNAME;
+  var password = process.env.REACT_APP_PASS;
+  var baseURL = process.env.REACT_APP_URL;
   const token = `${username}:${password}`;
   const encodedToken = Buffer.from(token).toString("base64");
 
